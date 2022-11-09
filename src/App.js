@@ -1,10 +1,10 @@
 import React, {useRef, useState, useMemo} from 'react';
 import PostFilter from './components/PostFilter';
 import PostList from './components/PostList';
+import ButtonForm from './components/UI/button/ButtonForm';
 import Form from './components/UI/Form';
-import InputForm from './components/UI/input/InputForm';
-import SelectForm from './components/UI/select/selectForm';
-// import Counter from './components/counter';
+import Modal from './components/UI/Modal/Modal';
+import { usePosts } from './hooks/usePosts';
 import './styles/App.css';
 
 function App() {
@@ -16,49 +16,43 @@ function App() {
 
   const createPost = (post) => {
     setPosts([...posts, post])
+    setModal(false)
   };
 
 
   const removePost = (postToRemove) => {
     setPosts(posts.filter(post => post.id !== postToRemove.id))
-  }
+  };
 
   const [filter, setFilter] = useState({sort: '', query: ''});
-
-  const sortedPosts = useMemo(() => {
-    console.log('worked');
-    if(filter.sort){
-      return [...posts].sort((a,b)=>a[filter.sort].localeCompare(b[filter.sort]));
-    } else {
-      return posts
-    }
-  }, [filter.sort, posts]);
-
-  const sortedAndSearchPosts = useMemo(()=>{
-    return sortedPosts.filter(post => post.title.toLowerCase().includes(filter.query.toLowerCase()))
-  }, [filter.query, sortedPosts])
-
+  const [modal, setModal] = useState(false);
+  const sortedAndSearchPosts = usePosts(posts, filter.sort, filter.query)
 
   return (
     <div className="App">
+
+      <ButtonForm 
+        style={{marginTop: '15px'}}
+        onClick={()=>setModal(true)}
+      >
+        Создать пост
+      </ButtonForm>
+      <Modal
+        visible={modal}
+        setVisible={setModal}
+      >
       <Form create={createPost}/>
+      </Modal>
       <hr style={{margin: '15px 0'}}/>
       <PostFilter 
         filter={filter}
         setFilter={setFilter}
       />
-      {sortedAndSearchPosts.length 
-      ? <PostList 
+      <PostList 
           remove={removePost}
           posts={sortedAndSearchPosts} 
-          title='Список постов:'/>
-      : <h4 style={{textAlign: 'center', 
-                    fontSize: '20px', 
-                    textTransform: 'uppercase'}}
-        >
-          Posts not found
-        </h4>    
-      }
+          title='Список постов:'
+        />
     </div>
   );
 }
