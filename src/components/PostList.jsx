@@ -1,0 +1,22 @@
+import React from 'react';
+import PostItem from './PostItem';
+
+const PostList = ({posts, title, remove}) => {
+  return (
+    <ul>
+            <h1
+        style={{textAlign: 'center'}}
+      >{title}</h1>
+      {posts.map((post,index) => 
+        <PostItem
+          remove={remove} 
+          index={index}
+          post={post}
+          key={post.id}
+        />
+      )}
+    </ul>
+  );
+}
+
+export default PostList;
